@@ -1,18 +1,26 @@
 {
-  "name": "nnptud-s5-25sep-db",
-  "version": "0.0.0",
-  "private": true,
+  "name": "nguyenquocminhhuy_2280601205",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hyuuuuuuuuu/NguyenQuocMinhHuy_2280601205.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hyuuuuuuuuu/NguyenQuocMinhHuy_2280601205/issues"
+  },
+  "homepage": "https://github.com/Hyuuuuuuuuu/NguyenQuocMinhHuy_2280601205#readme",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "ejs": "^3.1.10",
-    "express": "^4.21.2",
-    "http-errors": "~1.6.3",
-    "mongoose": "^8.18.2",
-    "morgan": "^1.10.1",
-    "nodemon": "^3.1.10"
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.3"
   }
 }
