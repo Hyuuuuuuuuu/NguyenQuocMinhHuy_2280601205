@@ -1,9 +1,10 @@
+// path: routes/index.js
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+// Route test
+router.get('/', function (req, res) {
+  res.status(200).json({ message: 'Server đang hoạt động' });
 });
 
 module.exports = router;

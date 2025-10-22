@@ -1,8 +1,9 @@
-module.exports = {
-    Response: function (res, statusCode,success, data) {
-        res.status(statusCode).send({
-            success: success,
-            data: data
-        })
-    }
+// path: utils/responseHandler.js
+function Response(res, statusCode, success, data) {
+  res.status(statusCode).json({
+    success,
+    data
+  });
 }
+
+module.exports = { Response };

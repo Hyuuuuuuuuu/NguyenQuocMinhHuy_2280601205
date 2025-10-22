@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Ảnh</title>
+  <style>
+    body { font-family: "Segoe UI", sans-serif; background: #f7f9fc; margin: 0; padding: 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    h1 { color: #333; }
+    button.logout { background: #dc3545; border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+    button.logout:hover { background: #b02a37; }
+    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+    .upload-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    input[type="file"] { margin-top: 10px; display: block; }
+    button { background: #007bff; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #0056b3; }
+    img.preview { display: block; max-width: 200px; margin-top: 15px; border-radius: 10px; border: 1px solid #ccc; }
+    .multi-preview img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; margin: 5px; border: 1px solid #ddd; }
+    .status { margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Upload Ảnh</h1>
+    <button class="logout" id="logoutBtn">Đăng xuất</button>
+  </header>
+
+  <div class="container">
+    <!-- Upload Avatar -->
+    <div class="upload-box">
+      <h2>Upload Avatar</h2>
+      <input type="file" id="avatar" accept="image/*" />
+      <button id="uploadAvatarBtn">Tải lên Avatar</button>
+      <div class="status" id="avatarStatus"></div>
+      <img id="avatarPreview" class="preview" />
+    </div>
+
+    <!-- Upload Nhiều Ảnh -->
+    <div class="upload-box">
+      <h2>Upload Nhiều Ảnh</h2>
+      <input type="file" id="multiImages" accept="image/*" multiple />
+      <button id="uploadMultiBtn">Tải lên</button>
+      <div class="status" id="multiStatus"></div>
+      <div class="multi-preview" id="multiPreview"></div>
+    </div>
+  </div>
+
+  <script>
+    // 🔹 Kiểm tra token đăng nhập
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Vui lòng đăng nhập trước!");
+      window.location.href = "/login.html";
+    }
+
+    // 🔹 Đăng xuất
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      alert("Đã đăng xuất!");
+      window.location.href = "/login.html";
+    });
+
+    // ==================== Upload Avatar ====================
+    document.getElementById("uploadAvatarBtn").addEventListener("click", async () => {
+      const fileInput = document.getElementById("avatar");
+      const status = document.getElementById("avatarStatus");
+      const preview = document.getElementById("avatarPreview");
+
+      if (!fileInput.files.length) { alert("Vui lòng chọn ảnh!"); return; }
+
+      const formData = new FormData();
+      formData.append("avatar", fileInput.files[0]);
+
+      try {
+        status.textContent = "Đang tải lên...";
+        const res = await fetch("/auth/upload-avatar", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token },
+          body: formData
+        });
+
+        const data = await res.json();
+        console.log("Upload Avatar Response:", data); // <-- debug backend trả gì
+
+        if (data.success) {
+          status.textContent = "Upload thành công!";
+          preview.src = data.data.avatarURL || "";
+        } else {
+          status.textContent = "Lỗi: " + (data.message || "Không rõ nguyên nhân");
+          if (data.message && data.message.toLowerCase().includes("token")) {
+            localStorage.removeItem("token");
+            alert("Token hết hạn, vui lòng đăng nhập lại.");
+            window.location.href = "/login.html";
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Đã xảy ra lỗi khi upload!";
+      }
+    });
+
+    // ==================== Upload Nhiều Ảnh ====================
+    document.getElementById("uploadMultiBtn").addEventListener("click", async () => {
+      const fileInput = document.getElementById("multiImages");
+      const status = document.getElementById("multiStatus");
+      const previewContainer = document.getElementById("multiPreview");
+
+      if (!fileInput.files.length) { alert("Vui lòng chọn ít nhất 1 ảnh!"); return; }
+
+      const formData = new FormData();
+      for (let file of fileInput.files) formData.append("image", file);
+
+      try {
+        status.textContent = "Đang tải lên...";
+        const res = await fetch("/files/uploadMulti", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token },
+          body: formData
+        });
+
+        const data = await res.json();
+        console.log("Upload Multi Response:", data); // <-- debug backend trả gì
+
+        if (data.success) {
+          status.textContent = "Upload thành công!";
+          previewContainer.innerHTML = "";
+          (data.data || []).forEach(url => {
+            const img = document.createElement("img");
+            img.src = url;
+            previewContainer.appendChild(img);
+          });
+        } else {
+          status.textContent = "Lỗi: " + (data.message || "Không rõ nguyên nhân");
+          if (data.message && data.message.toLowerCase().includes("token")) {
+            localStorage.removeItem("token");
+            alert("Token hết hạn, vui lòng đăng nhập lại.");
+            window.location.href = "/login.html";
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Đã xảy ra lỗi khi upload!";
+      }
+    });
+  </script>
+</body>
+</html>
